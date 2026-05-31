@@ -3,23 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Circle</title>
+  <title>We Are Writing About Our Trip</title>
   <link rel="stylesheet" href="style.css" />
   <script src="data.js"></script>
 </head>
 <body>
   <div class="page">
     <header class="site-header">
-      <div class="site-name"><a href="index.html"></a></div>
+      <div class="site-header-rule">* * * * * * * * * *</div>
+      <div class="site-name"><a href="index.html" id="site-name"></a></div>
+      <p class="site-tagline" id="site-tagline"></p>
+      <hr class="header-divider" />
     </header>
+
     <main>
       <div class="prompt-page-header">
-        <a class="back-link" href="index.html">All prompts</a>
+        <a class="back-link" href="index.html">all prompts</a>
         <h1 class="prompt-heading" id="prompt-heading"></h1>
         <p class="prompt-date" id="prompt-date"></p>
       </div>
+
+      <p class="section-label">[ submissions ]</p>
       <ul class="submission-list" id="submission-list"></ul>
     </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
   </div>
 
   <script>
@@ -30,27 +38,30 @@
       });
     }
 
-    document.querySelector('.site-name a').textContent = SITE.name;
+    document.getElementById('site-name').textContent = SITE.name;
+    document.getElementById('site-tagline').textContent = SITE.tagline;
+    document.getElementById('site-footer').textContent =
+      `[ last updated: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} ]`;
 
     const slug = decodeURIComponent(location.hash.slice(1));
     const prompt = PROMPTS.find(p => p.slug === slug);
 
     if (!prompt) {
-      document.getElementById('prompt-heading').textContent = 'Prompt not found.';
+      document.getElementById('prompt-heading').textContent = '// prompt not found';
     } else {
       document.title = `${prompt.title} — ${SITE.name}`;
       document.getElementById('prompt-heading').textContent = prompt.title;
-      document.getElementById('prompt-date').textContent = `Launched ${formatDate(prompt.date)}`;
+      document.getElementById('prompt-date').textContent = `launched: ${formatDate(prompt.date)}`;
 
       const list = document.getElementById('submission-list');
       if (!prompt.submissions.length) {
-        list.innerHTML = '<li class="empty">No submissions yet.</li>';
+        list.innerHTML = '<li class="empty">// no submissions yet</li>';
       } else {
         list.innerHTML = prompt.submissions.map(s => `
           <li class="submission-item">
             <a class="submission-link" href="${s.file}">
               <span class="submission-title">${s.title}</span>
-              <span class="submission-author">${s.author}</span>
+              <span class="submission-author">— ${s.author}</span>
             </a>
           </li>`).join('');
       }
