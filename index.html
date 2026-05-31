@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Circle</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="data.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="site-name"><a href="index.html"></a></div>
+      <p class="site-tagline"></p>
+    </header>
+    <main>
+      <ul class="prompt-list" id="prompt-list"></ul>
+    </main>
+  </div>
+
+  <script>
+    function formatDate(iso) {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric'
+      });
+    }
+
+    document.title = SITE.name;
+    document.querySelector('.site-name a').textContent = SITE.name;
+    document.querySelector('.site-tagline').textContent = SITE.tagline;
+
+    const list = document.getElementById('prompt-list');
+    if (!PROMPTS.length) {
+      list.innerHTML = '<li class="empty">No prompts yet.</li>';
+    } else {
+      list.innerHTML = PROMPTS.map(p => {
+        const count = p.submissions.length;
+        const label = count === 1 ? '1 submission' : `${count} submissions`;
+        return `
+          <li class="prompt-item">
+            <a class="prompt-link" href="prompt.html#${encodeURIComponent(p.slug)}">
+              <span>
+                <span class="prompt-title">${p.title}</span>
+                <span class="prompt-count">${label}</span>
+              </span>
+              <span class="prompt-meta">${formatDate(p.date)}</span>
+            </a>
+          </li>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
