@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Traveler</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f2ead8;
+    --parchment: #e8dcc4;
+    --ink: #1a1408;
+    --rust: #7a3b1e;
+    --moss: #3d4a2e;
+    --river: #4a6e7a;
+    --gold: #a07830;
+    --shadow: rgba(26, 20, 8, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--ink);
+    font-family: 'Spectral', Georgia, serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* Starfield background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 30%, #1a2a1a 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, #0a1520 0%, transparent 50%),
+      #0d1008;
+    z-index: 0;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,220,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 45%, rgba(255,255,220,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 20%, rgba(255,255,220,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 60%, rgba(255,255,220,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 10%, rgba(255,255,220,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 80%, rgba(255,255,220,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(255,255,220,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 35%, rgba(255,255,220,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 85%, rgba(255,255,220,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 25% 55%, rgba(255,255,220,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 50%, rgba(255,255,220,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 70%, rgba(255,255,220,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 70% 5%, rgba(255,255,220,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 38% 12%, rgba(255,255,220,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 40%, rgba(255,255,220,0.3) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Mountain silhouette SVG divider */
+  .mountain-divider {
+    width: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 80px 20px 48px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .header-eyebrow {
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.9rem;
+    letter-spacing: 0.25em;
+    color: var(--river);
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 20px;
+    animation: fadeUp 1.2s ease both;
+  }
+
+  /* Header title */
+  .title-place {
+    display: block;
+    font-size: 0.42em;
+    font-weight: 400;
+    font-style: italic;
+    color: #b8921a;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.1em;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.05;
+    color: var(--cream);
+    text-shadow: 0 2px 40px rgba(160, 120, 48, 0.3);
+    animation: fadeUp 1.2s ease 0.15s both;
+    margin-bottom: 16px;
+  }
+
+  .header-subtitle {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--gold);
+    opacity: 0.8;
+    letter-spacing: 0.05em;
+    animation: fadeUp 1.2s ease 0.3s both;
+    margin-bottom: 40px;
+  }
+
+  .header-rule {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 0 auto;
+    animation: fadeUp 1.2s ease 0.4s both;
+  }
+
+  /* Parchment card */
+  .parchment {
+    background: var(--cream);
+    background-image: 
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    border-radius: 2px;
+    padding: 56px 64px;
+    position: relative;
+    box-shadow: 
+      0 4px 6px var(--shadow),
+      0 12px 40px rgba(0,0,0,0.5),
+      inset 0 0 60px rgba(160,120,48,0.07);
+    animation: fadeUp 1.2s ease 0.5s both;
+  }
+
+  /* Inner border detail */
+  .parchment::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(122, 59, 30, 0.18);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  /* Corner ornaments */
+  .parchment::after {
+    content: '❧';
+    position: absolute;
+    bottom: 22px;
+    right: 28px;
+    font-size: 1.1rem;
+    color: var(--rust);
+    opacity: 0.35;
+  }
+
+  .corner-tl {
+    position: absolute;
+    top: 18px;
+    left: 24px;
+    font-size: 1.1rem;
+    color: var(--rust);
+    opacity: 0.35;
+  }
+
+  /* Paragraphs */
+  .essay p {
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 1.085rem;
+    line-height: 1.82;
+    color: #2a1e10;
+    margin-bottom: 1.6em;
+    font-weight: 400;
+    hyphens: auto;
+  }
+
+  .essay p:first-child::first-letter {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 4.2em;
+    font-weight: 700;
+    float: left;
+    line-height: 0.78;
+    margin: 0.08em 0.1em -0.05em 0;
+    color: var(--rust);
+  }
+
+  .essay p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Inline italics for emphasis */
+  .essay em {
+    font-style: italic;
+    color: var(--moss);
+  }
+
+  /* Section break ornament */
+  .ornament {
+    text-align: center;
+    margin: 2em 0;
+    color: var(--gold);
+    opacity: 0.5;
+    font-size: 1.2rem;
+    letter-spacing: 0.4em;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 48px 20px 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer-text {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    color: var(--river);
+    opacity: 0.55;
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Mountain SVG */
+  .mountain-svg-wrap {
+    position: relative;
+    z-index: 1;
+    margin-bottom: -2px;
+    line-height: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .parchment { padding: 36px 28px; }
+    .essay p { font-size: 1rem; }
+    .header-title { font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="header">
+  <h1 class="header-title"><span class="title-place">West Virginia,</span><br>The Time Traveler</h1>
+  <div class="header-rule"></div>
+</div>
+
+<!-- Mountain silhouette -->
+<div class="mountain-svg-wrap">
+  <svg viewBox="0 0 1200 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:130px;display:block;">
+
+    <!-- ========== BACK RANGE (distant, muted) ========== -->
+    <!-- fills the whole back layer solid so parchment shows through at top -->
+    <g opacity="0.28" fill="#c8b88a" stroke="none">
+      <!-- back peak cluster left -->
+      <polygon points="30,160 110,55 165,100 200,160"/>
+      <polygon points="80,160 155,40 220,80 270,160"/>
+      <polygon points="180,160 255,60 310,95 350,160"/>
+      <!-- back center peaks -->
+      <polygon points="310,160 390,30 450,75 500,160"/>
+      <polygon points="420,160 500,50 560,85 610,160"/>
+      <polygon points="540,160 620,45 675,80 720,160"/>
+      <!-- back right peaks -->
+      <polygon points="660,160 740,55 790,90 840,160"/>
+      <polygon points="770,160 850,35 910,70 960,160"/>
+      <polygon points="890,160 970,50 1025,85 1070,160"/>
+      <polygon points="1010,160 1090,40 1150,75 1200,120 1200,160"/>
+      <polygon points="1100,160 1160,60 1200,90 1200,160"/>
+    </g>
+
+    <!-- ========== FORE RANGE (main, parchment) ========== -->
+    <!-- Solid filled mountains, parchment colored -->
+
+    <!-- Far left shoulder -->
+    <polygon points="0,160 0,118 55,160" fill="#f2ead8"/>
+
+    <!-- Peak 1 – tall left anchor -->
+    <polygon points="20,160 115,28 200,160" fill="#f2ead8"/>
+    <!-- inner ridge line on peak 1 -->
+    <polyline points="115,28 148,90 200,160" fill="none" stroke="#c8a96e" stroke-width="1.2" opacity="0.5"/>
+
+    <!-- Peak 2 – smaller saddle peak -->
+    <polygon points="155,160 230,75 295,160" fill="#f2ead8"/>
+    <polyline points="230,75 258,118 295,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.45"/>
+
+    <!-- Peak 3 – tallest center-left -->
+    <polygon points="248,160 355,12 455,160" fill="#f2ead8"/>
+    <polyline points="355,12 318,70 248,160" fill="none" stroke="#c8a96e" stroke-width="1.2" opacity="0.5"/>
+    <polyline points="355,12 395,68 455,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.4"/>
+
+    <!-- Peak 4 – medium right of center-left -->
+    <polygon points="400,160 480,50 555,160" fill="#f2ead8"/>
+    <polyline points="480,50 450,100 400,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.45"/>
+
+    <!-- Peak 5 – wide center dome -->
+    <polygon points="510,160 620,18 725,160" fill="#f2ead8"/>
+    <polyline points="620,18 580,80 510,160" fill="none" stroke="#c8a96e" stroke-width="1.2" opacity="0.5"/>
+    <polyline points="620,18 665,78 725,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.4"/>
+    <!-- small secondary notch -->
+    <polyline points="620,18 635,55 660,48 690,90" fill="none" stroke="#c8a96e" stroke-width="0.8" opacity="0.3"/>
+
+    <!-- Peak 6 – right-center, medium -->
+    <polygon points="678,160 762,42 840,160" fill="#f2ead8"/>
+    <polyline points="762,42 735,95 678,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.45"/>
+
+    <!-- Peak 7 – small foreground bump -->
+    <polygon points="800,160 855,80 910,160" fill="#f2ead8"/>
+
+    <!-- Peak 8 – tall right anchor -->
+    <polygon points="860,160 970,22 1075,160" fill="#f2ead8"/>
+    <polyline points="970,22 935,78 860,160" fill="none" stroke="#c8a96e" stroke-width="1.2" opacity="0.5"/>
+    <polyline points="970,22 1010,76 1075,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.4"/>
+
+    <!-- Peak 9 – far right medium -->
+    <polygon points="1030,160 1110,48 1185,160" fill="#f2ead8"/>
+    <polyline points="1110,48 1085,100 1030,160" fill="none" stroke="#c8a96e" stroke-width="1" opacity="0.4"/>
+
+    <!-- Far right shoulder fill -->
+    <polygon points="1150,160 1200,80 1200,160" fill="#f2ead8"/>
+
+    <!-- Bottom fill bar to ensure no gap -->
+    <rect x="0" y="155" width="1200" height="5" fill="#f2ead8"/>
+  </svg>
+</div>
+
+<div class="page-wrapper">
+  <div class="parchment">
+    <span class="corner-tl">☙</span>
+    <div class="essay">
+      <p>Say I am a time traveler, sent from the porch of my grandmother's cabin far back into the past, before that house was built, before the red creek wound its way through the hollers of West Virginia. Say I am sent back 1 billion years ago, when the Appalachian mountains began to rise from the primordial sea, when ancient continents collided and forced the rocks to fold upon themselves, to rise, over hundreds of millions of years, to form a range thousands of miles long and taller than the Himalayas.</p>
+
+      <p>Say you move forward in time, as the plates shifted, and the mountains began to erode back down into the earth, the great range split across three continents, only echoes of similarity in their geography, if you know what you're looking for. Imagine the first Indians, 15,000 years ago, who had made their way across the great flat expanse of the middle of the continent, who reached these mountains and faced the creatures who lived within them: massive sloths and saber-toothed tigers, now-extinct beasts who hid in the narrow valleys and melting glacial plains.</p>
+
+      <p>Imagine the frontiersmen who fought the Indians, killed for the right to carve out a little farm in the depths of the mountains, survive long enough to hand it off to his child, who might mine coal, or keep cattle.</p>
+
+      <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+      <p>When my grandfather bought this place in 1974, they used to go to church in Davis, where congregants would speak in tongues and worship with snakes wrapped around their arms. The mountains hold secrets, make men crazy, or at least keep people separated from the slow march of progress which stamps out those ideas. My grandfather's ashes were scattered in the field above the cabin. I tell myself I feel his presence when I am out there; maybe I am infected with the same backwards superstition that leads worshipers to speak in forgotten languages. Maybe it's all in my head..?</p>
+
+      <p>I watched my friends catch a fish in the same creek where my grandpa taught me to fish when I was three or four. We played beer pong on the table I used to sit with my family and eat after spending the day at the river. My friends, adults, packed into the same bunk beds my brother and cousins would stay up whispering.</p>
+
+      <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+      <p>In one billion years the cabin will be gone, my bones gone, any memory of this place will not exist. The Appalachian mountains will have receded back into the sea, replaced by new continents and species. But my children will fish that river, my friends will sit around campfires in that valley, and my grandfather's memory will linger in the bones of that house. In 30 years, maybe, my kids will play beer pong with their friends outside that house. By then, the scientists will have invented a time machine, and I will begin my journey back into the past, first to the ancient origins of the mountain range, to the first encounters with Indians, to 15,000 years ago, where I will die having been eaten by a giant sloth. And I will think back on my life, which will be in the future, and remember how I whooped you all in beer die in West Virginia.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">The Appalachians — rising &amp; falling since 1,000,000,000 B.C.</div>
+</div>
+
+</body>
+</html>
